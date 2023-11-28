@@ -1,5 +1,6 @@
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
+using System.Diagnostics.Tracing;
 
 namespace Tasks
 {
@@ -31,7 +32,31 @@ namespace Tasks
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            var taskName = "Pregled Ali";
+
+            Thread.Sleep(2000); 
+            
+            var getStartedButton = driver.FindElementById("com.google.android.apps.tasks:id/welcome_get_started"); 
+            getStartedButton.Click();
+
+            var createTask = driver.FindElementByXPath("//android.widget.ImageButton[@content-desc=\"Create new task\"]");
+            createTask.Click();
+
+            Thread.Sleep(2000);
+
+            var newTaskField = driver.FindElementById("com.google.android.apps.tasks:id/add_task_title");
+            newTaskField.SendKeys(taskName);
+
+            var saveButton = driver.FindElementById("com.google.android.apps.tasks:id/add_task_done");
+            saveButton.Click();
+
+            var createdTask = driver.FindElementByXPath("//android.view.ViewGroup/android.widget.TextView");
+
+            Thread.Sleep(2000);
+
+            Assert.That(createdTask, Is.Not.Null);
+            Assert.That(createdTask.Text, Is.EqualTo(taskName));
+
         }
     }
 }
