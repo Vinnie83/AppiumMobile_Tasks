@@ -1,6 +1,8 @@
+using OpenQA.Selenium;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
 using System.Diagnostics.Tracing;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Tasks
 {
@@ -11,12 +13,70 @@ namespace Tasks
         private AndroidDriver<AndroidElement> driver;
         private AppiumOptions options;
 
-        [SetUp]
+        private string taskAli = "Pregled Ali"; 
+
+        [OneTimeSetUp]
         public void Setup()
         {
             this.options = new AppiumOptions() { PlatformName = "Android"};
             options.AddAdditionalCapability("app", appLocation);
             this.driver =new AndroidDriver<AndroidElement>(new Uri(appiumServer), options);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+
+            var getStartedButton = driver.FindElementById("com.google.android.apps.tasks:id/welcome_get_started");
+            getStartedButton.Click();
+
+            if (IsTaskPresent(taskAli))
+            {
+                DeleteTask(taskAli);
+            }
+            
+        }
+
+        private void DeleteTask(string taskAli)
+        {
+            var createdTask = driver.FindElementByXPath("//android.widget.FrameLayout[@content-desc=\"Pregled Ali\"]/android.view.ViewGroup/android.widget.TextView");
+            createdTask.Click();
+            
+            var moreOptionsButon = driver.FindElementByXPath("//android.widget.ImageView[@content-desc=\"More options\"]");
+            moreOptionsButon.Click();
+
+            var deleteOption = driver.FindElementById("com.google.android.apps.tasks:id/title");
+            deleteOption.Click();   
+        }
+
+        private bool IsTaskPresent(string taskAli)
+        {
+            try
+            {
+                var presentTask = driver.FindElementByXPath("//android.widget.FrameLayout[@content-desc=\"Pregled Ali\"]/android.view.ViewGroup/android.widget.TextView");
+
+                return presentTask != null;
+            
+            }
+            
+            catch(NoSuchElementException)
+            {
+                return false;
+
+            }
+                      
+        }
+
+        private void CreateTask(string taskAli)
+        {
+            
+
+            var createTask = driver.FindElementByXPath("//android.widget.ImageButton[@content-desc=\"Create new task\"]");
+            createTask.Click();
+
+            Thread.Sleep(2000);
+
+            var newTaskField = driver.FindElementById("com.google.android.apps.tasks:id/add_task_title");
+            newTaskField.SendKeys("Pregled Ali");
+
+            var saveButton = driver.FindElementById("com.google.android.apps.tasks:id/add_task_done");
+            saveButton.Click();
         }
 
         [TearDown]
@@ -34,22 +94,10 @@ namespace Tasks
         {
             var taskName = "Pregled Ali";
 
-            Thread.Sleep(2000); 
-            
-            var getStartedButton = driver.FindElementById("com.google.android.apps.tasks:id/welcome_get_started"); 
-            getStartedButton.Click();
-
-            var createTask = driver.FindElementByXPath("//android.widget.ImageButton[@content-desc=\"Create new task\"]");
-            createTask.Click();
-
             Thread.Sleep(2000);
 
-            var newTaskField = driver.FindElementById("com.google.android.apps.tasks:id/add_task_title");
-            newTaskField.SendKeys(taskName);
-
-            var saveButton = driver.FindElementById("com.google.android.apps.tasks:id/add_task_done");
-            saveButton.Click();
-
+            CreateTask(taskName);
+            
             var createdTask = driver.FindElementByXPath("//android.widget.FrameLayout[@content-desc=\"Pregled Ali\"]/android.view.ViewGroup/android.widget.TextView");
 
             Thread.Sleep(2000);
