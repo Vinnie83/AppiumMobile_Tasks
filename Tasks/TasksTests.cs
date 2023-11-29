@@ -50,7 +50,7 @@ namespace Tasks
             var saveButton = driver.FindElementById("com.google.android.apps.tasks:id/add_task_done");
             saveButton.Click();
 
-            var createdTask = driver.FindElementByXPath("//android.view.ViewGroup/android.widget.TextView");
+            var createdTask = driver.FindElementByXPath("//android.widget.FrameLayout[@content-desc=\"Pregled Ali\"]/android.view.ViewGroup/android.widget.TextView");
 
             Thread.Sleep(2000);
 
